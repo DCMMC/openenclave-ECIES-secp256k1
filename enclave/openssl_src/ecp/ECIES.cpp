@@ -51,6 +51,10 @@
 #include <openssl/hmac.h>
 #include <openssl/pem.h>
 
+// (DCMMC) must disable USE_LOW_OPENSSL. Because openclave does not support low version
+// of openssl!
+// #define USE_LOW_OPENSSL
+
 namespace ripple {
 
 // ECIES uses elliptic curve keys to send an encrypted message.
@@ -381,7 +385,7 @@ static ECIES_HMAC_TYPE makeHMAC_SSL102(const ECIES_HMAC_KEY_TYPE& secret, Blob c
 	return ret;
 }
 // Blob encryptECIES_SSL102(uint256 const& secretKey, Blob const& publicKey, Blob const& plaintext)
-Blob encryptECIES_SSL102(Blob256 const& secretKey, Blob const& publicKey, Blob const& plaintext)
+Blob encryptECIES_SSL102(Blob256 const& secretKey, Blob288 const& publicKey, Blob const& plaintext)
 {
 	if (plaintext.size() == 0)
 		Throw<std::runtime_error>("plaintext is empty");
@@ -462,7 +466,7 @@ Blob encryptECIES_SSL102(Blob256 const& secretKey, Blob const& publicKey, Blob c
 }
 
 // Blob decryptECIES_SSL102(uint256 const& secretKey, Blob const& publicKey, Blob const& ciphertext)
-Blob decryptECIES_SSL102(Blob256 const& secretKey, Blob const& publicKey, Blob const& ciphertext)
+Blob decryptECIES_SSL102(Blob256 const& secretKey, Blob288 const& publicKey, Blob const& ciphertext)
 {
 	// minimum ciphertext = IV + HMAC + 1 block
 	if (ciphertext.size() < ((2 * ECIES_ENC_BLK_SIZE) + ECIES_HMAC_SIZE))
@@ -564,8 +568,8 @@ Blob asymEncrypt(Blob const& passBlob, Blob const& publicKey)
     // auto const type = publicKeyType(publicKey);
     // auto const ephKeyPair = randomKeyPair(*type);
     Blob288 ephPublKey;
-    Blob255 ephPrivKey;
-    ret = ec_generate_keypair(ephPublKey, ephPrivKey);
+    Blob256 ephPrivKey;
+    ret = ec_generate_keypair(ephPrivKey, ephPublKey);
     // PublicKey ephPublKey = ephKeyPair.first;
     Blob vucCipherText;
     if (ret)
@@ -574,20 +578,23 @@ Blob asymEncrypt(Blob const& passBlob, Blob const& publicKey)
         return vucCipherText;
     }
 
-    Blob publickBlob(publicKey.data(), publicKey.data() + publicKey.size());
+    Blob288 publickBlob;
+    for ( int i = 0; i < publickBlob.size(); i++ )
+    {
+        publickBlob[i] = publicKey[i];
+    }
 
     // SecretKey ephPrivKey = ephKeyPair.second;
     // Blob privateBlob(ephPrivKey.data(), ephPrivKey.data() + ephPrivKey.size());
     // uint256 secretKey = uint256::fromVoid(privateBlob.data() + (privateBlob.size() - 32));
     // Blob secretKey(privateBlob.data() + (privateBlob.size() - 32));
-    Blob secretkey(ephPrivKey.data(), ephPrivKey.data() + ephPrivKey.size());
 
     try
     {
 #ifdef USE_LOW_OPENSSL
-        vucCipherText = encryptECIES_SSL102(secretKey, publickBlob, passBlob);
+        vucCipherText = encryptECIES_SSL102(ephPrivKey, publickBlob, passBlob);
 #else
-        vucCipherText = encryptECIES(secretKey, publickBlob, passBlob);
+        vucCipherText = encryptECIES(ephPrivKey, publickBlob, passBlob);
 #endif
     }
     catch (std::exception const&)
@@ -606,7 +613,11 @@ Blob asymEncrypt(Blob const& passBlob, Blob const& publicKey)
 // Blob asymDecrypt(Blob const& cipherBlob, SecretKey const& secret_key)
 Blob asymDecrypt(Blob const& cipherBlob, Blob const& secret_key)
 {
-    Blob publickBlob(cipherBlob.data(), cipherBlob.data() + 33);
+    Blob288 publickBlob;
+    for ( int i = 0; i < 33; i++ )
+    {
+        publickBlob[i] = cipherBlob[i];
+    }
     //truncate real cipher
     Blob realCipher(cipherBlob.data() + 33, cipherBlob.data() + cipherBlob.size());
     // PublicKey ephPublKey(Slice{ publickBlob.data(), publickBlob.size() });
@@ -615,7 +626,11 @@ Blob asymDecrypt(Blob const& cipherBlob, Blob const& secret_key)
     // Blob privateBlob(secret_key.data(), secret_key.data() + secret_key.size());
     // uint256 secretKey = uint256::fromVoid(privateBlob.data() + (privateBlob.size() - 32));
     // Blob secretKey(privateBlob.data() + (privateBlob.size() - 32));
-    Blob secretKey(secret_key.data(), secret_key.data() + secret_key.size());
+    Blob256 secretKey;
+    for ( int i = 0; i < secretKey.size(); i++ )
+    {
+        secretKey[i] = secret_key[i];
+    }
 
     Blob vucPlainText;
     {

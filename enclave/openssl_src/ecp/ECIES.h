@@ -56,7 +56,9 @@ Blob encryptECIES (Blob256 const& secretKey, Blob288 const& publicKey, Blob cons
 Blob decryptECIES (Blob256 const& secretKey, Blob288 const& publicKey, Blob const& ciphertext);
 
 // Blob asymEncrypt(Blob const& passBlob, PublicKey const& publicKey);
+Blob asymEncrypt(Blob const& passBlob, Blob const& publicKey);
 // Blob asymDecrypt(Blob const& cipherBlob, SecretKey const& secret_key);
+Blob asymDecrypt(Blob const& cipherBlob, Blob const& secret_key);
 
 } // ripple
 

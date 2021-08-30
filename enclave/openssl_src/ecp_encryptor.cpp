@@ -35,9 +35,7 @@ int ecall_dispatcher::test_ecp_secp256k1()
                 ( i + 1 ) % 16 == 0 ? "\r\n" : " ");
     }
     Blob secretKey(secret_key.data(), secret_key.data() + secret_key.size());
-    Blob cipher(publicKey.data(), publicKey.data() + publicKey.size());
-    cipher.insert(cipher.end(), publicKey.begin(), publicKey.end());
-    Blob decrypted_data = asymDecrypt(cipher, secretKey);
+    Blob decrypted_data = asymDecrypt(cipher_data, secretKey);
     TRACE_ENCLAVE("Decrypted data:");
     for ( int i = 0; i < decrypted_data.size(); i++ )
     {
