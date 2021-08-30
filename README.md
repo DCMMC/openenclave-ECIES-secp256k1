@@ -12,6 +12,7 @@ The steps required to build and run the samples on Linux are described in [Build
 Currently only test on Linux (Ubuntu 20.04 w/ simulate mode):
 
 ```bash
+. /opt/openenclave/share/openenclave/openenclaverc
 make build && make simulate
 ```
 

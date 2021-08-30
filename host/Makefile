@@ -1,7 +1,7 @@
 # Copyright (c) Open Enclave SDK contributors.
 # Licensed under the MIT License.
 
-include ../../config.mk
+include ../config.mk
 
 CFLAGS=$(shell pkg-config oehost-$(C_COMPILER) --cflags)
 CXXFLAGS=$(shell pkg-config oehost-$(CXX_COMPILER) --cflags)
