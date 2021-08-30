@@ -557,20 +557,30 @@ Blob decryptECIES_SSL102(Blob256 const& secretKey, Blob const& publicKey, Blob c
 }
 #endif
 
-/*
-Blob asymEncrypt(Blob const& passBlob, PublicKey const& publicKey)
+// Blob asymEncrypt(Blob const& passBlob, PublicKey const& publicKey)
+Blob asymEncrypt(Blob const& passBlob, Blob const& publicKey)
 {
-    auto const type = publicKeyType(publicKey);
-    auto const ephKeyPair = randomKeyPair(*type);
-    PublicKey ephPublKey = ephKeyPair.first;
+    int ret = 0;
+    // auto const type = publicKeyType(publicKey);
+    // auto const ephKeyPair = randomKeyPair(*type);
+    Blob288 ephPublKey;
+    Blob255 ephPrivKey;
+    ret = ec_generate_keypair(ephPublKey, ephPrivKey);
+    // PublicKey ephPublKey = ephKeyPair.first;
     Blob vucCipherText;
+    if (ret)
+    {
+        TRACE_ENCLAVE("ec_generate_keypair failed in asymEncrypt!");
+        return vucCipherText;
+    }
 
     Blob publickBlob(publicKey.data(), publicKey.data() + publicKey.size());
 
-    SecretKey ephPrivKey = ephKeyPair.second;
-    Blob privateBlob(ephPrivKey.data(), ephPrivKey.data() + ephPrivKey.size());
+    // SecretKey ephPrivKey = ephKeyPair.second;
+    // Blob privateBlob(ephPrivKey.data(), ephPrivKey.data() + ephPrivKey.size());
     // uint256 secretKey = uint256::fromVoid(privateBlob.data() + (privateBlob.size() - 32));
-    Blob secretKey(privateBlob.data() + (privateBlob.size() - 32));
+    // Blob secretKey(privateBlob.data() + (privateBlob.size() - 32));
+    Blob secretkey(ephPrivKey.data(), ephPrivKey.data() + ephPrivKey.size());
 
     try
     {
@@ -593,18 +603,19 @@ Blob asymEncrypt(Blob const& passBlob, PublicKey const& publicKey)
     return finalCipher;
 }
 
-Blob asymDecrypt(Blob const& cipherBlob, SecretKey const& secret_key)
+// Blob asymDecrypt(Blob const& cipherBlob, SecretKey const& secret_key)
+Blob asymDecrypt(Blob const& cipherBlob, Blob const& secret_key)
 {
-    Blob publickBlob(cipherBlob.begin(), cipherBlob.begin() + 33);
+    Blob publickBlob(cipherBlob.data(), cipherBlob.data() + 33);
     //truncate real cipher
-    Blob realCipher(cipherBlob.begin() + 33, cipherBlob.end());
-    
-    PublicKey ephPublKey(Slice{ publickBlob.data(), publickBlob.size() });
-    auto const type = publicKeyType(ephPublKey);
+    Blob realCipher(cipherBlob.data() + 33, cipherBlob.data() + cipherBlob.size());
+    // PublicKey ephPublKey(Slice{ publickBlob.data(), publickBlob.size() });
+    // auto const type = publicKeyType(ephPublKey);
 
-    Blob privateBlob(secret_key.data(), secret_key.data() + secret_key.size());
+    // Blob privateBlob(secret_key.data(), secret_key.data() + secret_key.size());
     // uint256 secretKey = uint256::fromVoid(privateBlob.data() + (privateBlob.size() - 32));
-    Blob secretKey(privateBlob.data() + (privateBlob.size() - 32));
+    // Blob secretKey(privateBlob.data() + (privateBlob.size() - 32));
+    Blob secretKey(secret_key.data(), secret_key.data() + secret_key.size());
 
     Blob vucPlainText;
     {
@@ -620,10 +631,10 @@ Blob asymDecrypt(Blob const& cipherBlob, SecretKey const& secret_key)
         catch (std::exception const&)
         {
             // TODO: log this or explain why this is unimportant!
+            TRACE_ENCLAVE("Exception in asymDecrypt!");
         }
     }
     return vucPlainText;
 }
-*/
 
 } // ripple

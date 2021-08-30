@@ -26,14 +26,18 @@ int ecall_dispatcher::test_ecp_secp256k1()
         TRACE_ENCLAVE("%02X%s", plain_data[i],
                 ( i + 1 ) % 16 == 0 ? "\r\n" : " ");
     }
-    Blob cipher_data = encryptECIES(secret_key, public_key, plain_data);
+    Blob publicKey(public_key.data(), public_key.data() + public_key.size());
+    Blob cipher_data = asymEncrypt(plain_data, publicKey);
     TRACE_ENCLAVE("Cipher data:");
     for ( int i = 0; i < cipher_data.size(); i++ )
     {
         TRACE_ENCLAVE("%02X%s", cipher_data[i],
                 ( i + 1 ) % 16 == 0 ? "\r\n" : " ");
     }
-    Blob decrypted_data = decryptECIES(secret_key, public_key, cipher_data);
+    Blob secretKey(secret_key.data(), secret_key.data() + secret_key.size());
+    Blob cipher(publicKey.data(), publicKey.data() + publicKey.size());
+    cipher.insert(cipher.end(), publicKey.begin(), publicKey.end());
+    Blob decrypted_data = asymDecrypt(cipher, secretKey);
     TRACE_ENCLAVE("Decrypted data:");
     for ( int i = 0; i < decrypted_data.size(); i++ )
     {

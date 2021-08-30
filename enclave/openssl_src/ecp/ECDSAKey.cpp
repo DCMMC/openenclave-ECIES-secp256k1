@@ -105,7 +105,7 @@ int ec_generate_keypair(Blob256 & secret_key, Blob288 & public_key)
         return -1;
     }
 
-    // EC_KEY_free(key);
+    EC_KEY_free(key);
     TRACE_ENCLAVE("done gen key.");
     return 0;
 }
