@@ -403,8 +403,8 @@ namespace eevm
 	const Code& _constructor) {
 
 	  // (DCMMC) test entrance, defined in enclave/enclave_ecalls.cpp
-	  // uint8_t ret;
-	  // test_ecp_secp256k1(enclave, &ret);
+	  uint8_t ret;
+	  test_ecp_secp256k1(enclave, &ret);
       std::cout << "start of Processor::deploy\n";
 
 	// 每50次保存一次
