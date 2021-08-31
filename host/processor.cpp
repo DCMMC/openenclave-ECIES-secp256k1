@@ -308,15 +308,11 @@ namespace eevm
 	o << std::setw(2) << gs_json_store << std::endl;
   }
 
-  void Processor::create_enclave() {
+  void Processor::create_enclave(char *enclave_name) {
 	// ==================== enclave create ====================
 	long start_time = clock();
 	oe_result_t oe_result = create_enclave_enclave(
-#ifdef OE_USE_OPTEE
-	  "FILL THIS IN",
-#else
-	  "enclave.elf.signed",
-#endif
+      enclave_name,
 	  & enclave);
 	if (oe_result != OE_OK)
 	{
@@ -409,6 +405,7 @@ namespace eevm
 	  // (DCMMC) test entrance, defined in enclave/enclave_ecalls.cpp
 	  // uint8_t ret;
 	  // test_ecp_secp256k1(enclave, &ret);
+      std::cout << "start of Processor::deploy\n";
 
 	// 每50次保存一次
 	run_number += 1;

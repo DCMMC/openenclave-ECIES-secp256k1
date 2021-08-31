@@ -13,7 +13,8 @@ Currently only test on Linux (Ubuntu 20.04 w/ simulate mode):
 
 ```bash
 . /opt/openenclave/share/openenclave/openenclaverc
-make build && make simulate
+mkdir build && cd build && cmake ..
+make -j 20 && make simulate
 ```
 
 #### Note

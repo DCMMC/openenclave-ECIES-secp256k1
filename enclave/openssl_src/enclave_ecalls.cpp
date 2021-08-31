@@ -15,12 +15,12 @@
 #include "myKeccak256.hpp"
 #include "myBigInt.hpp"
 
-#include "evm_enclave_headfile.h"
+#include "../../evm_enclave_headfile.h"
 
-#include "ECIES.h"
-#include "ECDSAKey.h"
-#include "Blob.h"
-#include "trace.h"
+#include "ecp/ECIES.h"
+#include "ecp/ECDSAKey.h"
+#include "ecp/Blob.h"
+#include "../common/trace.h"
 #include <string>
 
 using namespace ripple;

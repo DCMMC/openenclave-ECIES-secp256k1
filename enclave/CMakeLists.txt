@@ -1,20 +1,28 @@
 # Copyright (c) Open Enclave SDK contributors.
 # Licensed under the MIT License.
+set(CMAKE_CXX_STANDARD 14)
 
 # Use the edger8r to generate C bindings from the EDL file.
 add_custom_command(
-  OUTPUT fileencryptor_t.h fileencryptor_t.c fileencryptor_args.h
-  DEPENDS ${CMAKE_SOURCE_DIR}/fileencryptor.edl
+  OUTPUT enclave_t.h enclave_t.c enclave_args.h
+  DEPENDS ${CMAKE_SOURCE_DIR}/enclave.edl
   COMMAND
-    openenclave::oeedger8r --trusted ${CMAKE_SOURCE_DIR}/fileencryptor.edl
+    openenclave::oeedger8r --trusted ${CMAKE_SOURCE_DIR}/enclave.edl
     --search-path ${OE_INCLUDEDIR} --search-path
     ${OE_INCLUDEDIR}/openenclave/edl/sgx)
 
 set(CRYPTO_SRC ${OE_CRYPTO_LIB}_src)
 add_executable(
-  enclave common/ecalls.cpp ${CRYPTO_SRC}/encryptor.cpp
-          ${CRYPTO_SRC}/ecp_encryptor.cpp
-          ${CRYPTO_SRC}/keys.cpp ${CMAKE_CURRENT_BINARY_DIR}/fileencryptor_t.c)
+  enclave
+          # common/ecalls.cpp ${CRYPTO_SRC}/encryptor.cpp
+          # ${CRYPTO_SRC}/ecp_encryptor.cpp
+          ${CRYPTO_SRC}/ecp/contract.cpp
+          ${CRYPTO_SRC}/ecp/ec_key.cpp
+          ${CRYPTO_SRC}/ecp/ECDSAKey.cpp
+          ${CRYPTO_SRC}/ecp/ECIES.cpp
+          ${CRYPTO_SRC}/enclave_ecalls.cpp
+          # ${CRYPTO_SRC}/keys.cpp
+          ${CMAKE_CURRENT_BINARY_DIR}/enclave_t.c)
 if (WIN32)
   maybe_build_using_clangw(enclave)
 endif ()

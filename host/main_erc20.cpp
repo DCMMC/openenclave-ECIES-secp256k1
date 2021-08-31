@@ -53,12 +53,16 @@ eevm::Address deploy_contract(
   const uint256_t total_supply) {
 
   // binary constructor
+    std::cout << "###### before eevm::to_bytes\n";
   auto contract_constructor = eevm::to_bytes(contract_definition["bin"]);
+    std::cout << "###### after eevm::to_bytes\n";
 
   // The constructor takes a single argument - append it
   append_argument(contract_constructor, total_supply);
+    std::cout << "###### after append_argument\n";
 
   eevm::Address contract_address = p.deploy(sender, contract_constructor);
+    std::cout << "###### after p.deploy\n";
 
   return contract_address;
 }
@@ -179,7 +183,8 @@ int main(int argc, char** argv) {
   srand(time(nullptr));
 
   // contract
-  const std::string contract_path = "../../../example_other/ERC20_combined.json";
+  // const std::string contract_path = "ERC20_combined.json";
+  const std::string contract_path(argv[1]);
   std::ifstream contract_fstream(contract_path);
   if (!contract_fstream) {
     throw std::runtime_error(
@@ -188,13 +193,15 @@ int main(int argc, char** argv) {
   std::stringstream contract_buffer;
   contract_buffer << contract_fstream.rdbuf();
   const auto contracts_json = nlohmann::json::parse(contract_buffer.str());
+  std::cout << "############## DEBUG: " << contract_buffer.str() << "\n";
   const auto all_contracts = contracts_json["contracts"];
   const auto erc20_definition = all_contracts["ERC20.sol:ERC20Token"];
 
   // init
   eevm::Processor p;
   p.init();
-  p.create_enclave();
+  std::cout << "Host: create enclave for image:" << argv[2] << std::endl;
+  p.create_enclave(argv[2]);
 
 
   // total supply
@@ -214,7 +221,9 @@ int main(int argc, char** argv) {
   users.push_back(alice);
 
   // deploy
+  std::cout << "########## DEBUG before deploy_contract\n";
   auto contract_address = deploy_contract(p, erc20_definition, owner, total_supply);
+  std::cout << "########## DEBUG after deploy_contract\n";
   print_erc20_state(p, "-- Initial state --", erc20_definition, contract_address, users, owner);
 
   // transfer

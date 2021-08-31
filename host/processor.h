@@ -19,11 +19,11 @@
 #include <utility>
 #include <ctime>
 
-#include "evm_enclave_headfile.h"
+#include "../evm_enclave_headfile.h"
 
 // ==================== enclave headfiles ====================
 #include <openenclave/host.h>
-#include "../../enclave_u.h"
+#include "enclave_u.h"
 // ==================== enclave headfiles ====================
 
 
@@ -55,7 +55,7 @@ namespace eevm
 
 	void save();
 
-	void create_enclave();
+	void create_enclave(char *enclave_name);
 
 	void close_enclave();
 

@@ -22,7 +22,8 @@ find_package(OpenEnclave CONFIG REQUIRED)
 
 set(CMAKE_CXX_STANDARD 11)
 set(OE_CRYPTO_LIB
-    mbedtls
+  # mbedtls
+    openssl
     CACHE STRING "Crypto library used by enclaves.")
 
 add_subdirectory(enclave)
@@ -46,13 +47,13 @@ add_custom_target(sign ALL DEPENDS enclave/enclave.signed)
 if ((NOT DEFINED ENV{OE_SIMULATION}) OR (NOT $ENV{OE_SIMULATION}))
   add_custom_target(
     run
-    DEPENDS file-encryptor_host sign testfile
-    COMMAND file-encryptor_host ${CMAKE_CURRENT_SOURCE_DIR}/testfile
+    DEPENDS file-encryptor_host sign ERC20_combined.json
+    COMMAND file-encryptor_host ${CMAKE_CURRENT_SOURCE_DIR}/ERC20_combined.json
             ${CMAKE_BINARY_DIR}/enclave/enclave.signed)
 endif ()
 
 add_custom_target(
   simulate
-  DEPENDS file-encryptor_host sign testfile
-  COMMAND file-encryptor_host ${CMAKE_CURRENT_SOURCE_DIR}/testfile
+  DEPENDS file-encryptor_host sign ERC20_combined.json
+  COMMAND file-encryptor_host ${CMAKE_CURRENT_SOURCE_DIR}/ERC20_combined.json
           ${CMAKE_BINARY_DIR}/enclave/enclave.signed --simulate)

@@ -11,6 +11,25 @@
 #pragma comment(lib, "Ws2_32.lib")
 #pragma warning(disable : 4996)
 
+#define linux
+
+#if defined (WIN32)
+#include <winsock2.h>
+typedef int socklen;
+#elif defined (linux)
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <unistd.h>
+#define INVALID_SOCKET -1
+#define SOCKET_ERROR -1
+#define closesocket(s) close(s)
+typedef int SOCKET;
+typedef struct sockaddr_in SOCKADDR_IN;
+typedef struct sockaddr SOCKADDR;
+#endif
+
 
 void push_ocall(uint64_t* pc, uint8_t bytes, uint8_t* code_arr, size_t code_size, unsigned char* res) {
   uint256_t imm = 0;
@@ -377,10 +396,15 @@ void connect_pwd_server(unsigned char* old_key, unsigned char* new_key) {
   SOCKADDR_IN sock_addr;
   memset(&sock_addr, 0, sizeof(SOCKADDR_IN));
 
+#if defined (WIN32)
   WORD wVersionRequested;
   WSADATA wsaData;
   wVersionRequested = MAKEWORD(1, 1);
+
   int ret_init = WSAStartup(wVersionRequested, &wsaData);
+#else
+  int ret_init = 0;
+#endif
   if (ret_init != 0) {
 	printf("startup failed!\n");
 	throw;
@@ -388,13 +412,24 @@ void connect_pwd_server(unsigned char* old_key, unsigned char* new_key) {
 
   sock_client = socket(AF_INET, SOCK_STREAM, 0);
   if (sock_client == INVALID_SOCKET) {
+#if defined (WIN32)
 	int error_code = WSAGetLastError();
+#else
+    // (DCMMC) TODO
+    int error_code = 0;
+#endif
 	printf("socket create failed, error code : %d\n", error_code);
 	throw;
   }
 
   sock_addr.sin_family = AF_INET;
+
+#if defined (WIN32)
   sock_addr.sin_addr.S_un.S_addr = inet_addr("127.0.0.1");
+#else
+  sock_addr.sin_addr.s_addr = inet_addr("127.0.0.1");
+#endif
+
   sock_addr.sin_port = htons(8000);
 
   int ret = connect(sock_client, (sockaddr*)&sock_addr, sizeof(SOCKADDR_IN));
