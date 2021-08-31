@@ -13,6 +13,7 @@ add_custom_command(
 set(CRYPTO_SRC ${OE_CRYPTO_LIB}_src)
 add_executable(
   enclave common/ecalls.cpp ${CRYPTO_SRC}/encryptor.cpp
+          ${CRYPTO_SRC}/ecp_encryptor.cpp
           ${CRYPTO_SRC}/keys.cpp ${CMAKE_CURRENT_BINARY_DIR}/fileencryptor_t.c)
 if (WIN32)
   maybe_build_using_clangw(enclave)

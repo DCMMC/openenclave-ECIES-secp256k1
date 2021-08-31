@@ -1,0 +1,166 @@
+// Copyright (c) 2021 Tsinghua Shenzhen International Graduate School
+// All rights reserved.
+
+enclave {
+
+    from "openenclave/edl/syscall.edl" import *;
+    from "platform.edl" import *;
+
+    include "../evm_enclave_headfile.h"
+
+    trusted {
+        /* define ECALLs here. */
+        public void test_ecp_secp256k1([in, out] uint8_t* ret);
+
+        public void enclave_run([in, out] exec_result_struct* result,
+                                [in, out] gs_struct* _gs,
+                                [in, out] tx_struct* _tx,
+                                [in, out, size=100] unsigned char* _caller,
+                                [in, out, size=100] unsigned char* _callee,
+                                [in, out, size=_input_size] uint8_t* _input,
+                                size_t _input_size,
+                                [in, out, size=100] unsigned char* _call_value,
+                                [in, out, size=256] uint8_t* taint_list);
+
+        public void enclave_deploy([in, out] gs_struct* _gs,
+                                   [in, out] tx_struct* _tx,
+                                   [in, out, size=100] unsigned char* _caller,
+                                   [in, out, size=_constructor_size] uint8_t* _constructor,
+                                   size_t _constructor_size,
+                                   [in, out, size=100] unsigned char* contract_address,
+                                   [in, out, size=256] uint8_t* taint_list);
+    };
+
+    untrusted {
+        /* define any OCALLs here. */
+
+        void push_ocall([in, out] uint64_t* pc, 
+                        uint8_t bytes, 
+                        [in, out, size=code_size] uint8_t* code_arr, 
+                        size_t code_size, 
+                        [in, out, size=100] unsigned char* res);
+
+        void add_ocall([in, size=100] unsigned char* x,
+                       [in, size=100] unsigned char* y,
+                       [in, out, size=100] unsigned char* res);
+
+        void mul_ocall([in, size=100] unsigned char* x,
+                       [in, size=100] unsigned char* y,
+                       [in, out, size=100] unsigned char* res);
+
+        void sub_ocall([in, size=100] unsigned char* x,
+                       [in, size=100] unsigned char* y,
+                       [in, out, size=100] unsigned char* res);
+
+        void div_ocall([in, size=100] unsigned char* x,
+                       [in, size=100] unsigned char* y,
+                       [in, out, size=100] unsigned char* res);
+
+        void sdiv_ocall([in, size=100] unsigned char* x,
+                        [in, size=100] unsigned char* y,
+                        [in, out, size=100] unsigned char* res);
+
+        void mod_ocall([in, size=100] unsigned char* x,
+                       [in, size=100] unsigned char* y,
+                       [in, out, size=100] unsigned char* res);
+
+        void smod_ocall([in, size=100] unsigned char* x,
+                        [in, size=100] unsigned char* y,
+                        [in, out, size=100] unsigned char* res);
+
+        void addmod_ocall([in, size=100] unsigned char* x,
+                          [in, size=100] unsigned char* y,
+                          [in, size=100] unsigned char* m,
+                          [in, out, size=100] unsigned char* res);
+
+        void mulmod_ocall([in, size=100] unsigned char* x,
+                          [in, size=100] unsigned char* y,
+                          [in, size=100] unsigned char* m,
+                          [in, out, size=100] unsigned char* res);
+
+        void exp_ocall([in, size=100] unsigned char* b,
+                       [in, size=100] unsigned char* e,
+                       [in, out, size=100] unsigned char* res);
+
+        void signextend_ocall([in, size=100] unsigned char* x,
+                              [in, size=100] unsigned char* y,
+                              [in, out, size=100] unsigned char* res);
+
+        void lt_ocall([in ,size=100] unsigned char* x, 
+                      [in ,size=100] unsigned char* y, 
+                      [in ,out, size=100] unsigned char* res);
+
+        void gt_ocall([in ,size=100] unsigned char* x, 
+                      [in ,size=100] unsigned char* y, 
+                      [in ,out, size=100] unsigned char* res);
+
+        void slt_ocall([in ,size=100] unsigned char* x, 
+                       [in ,size=100] unsigned char* y, 
+                       [in ,out, size=100] unsigned char* res);
+
+        void eq_ocall([in ,size=100] unsigned char* x, 
+                      [in ,size=100] unsigned char* y, 
+                      [in ,out, size=100] unsigned char* res);
+
+        void isZero_ocall([in ,size=100] unsigned char* x, 
+                          [in ,out, size=100] unsigned char* res);
+
+        void and_ocall([in ,size=100] unsigned char* x, 
+                       [in ,size=100] unsigned char* y, 
+                       [in ,out, size=100] unsigned char* res);
+
+        void or_ocall([in, size=100] unsigned char* x, 
+                      [in, size=100] unsigned char* y, 
+                      [in ,out, size=100] unsigned char* res);
+
+        void xor_ocall([in, size=100] unsigned char* x, 
+                       [in, size=100] unsigned char* y, 
+                       [in ,out, size=100] unsigned char* res);
+
+        void not_ocall([in, size=100] unsigned char* x, 
+                       [in, out, size=100] unsigned char* res);
+
+        void byte_ocall([in, size=100] unsigned char* idx, 
+                        [in, size=100] unsigned char* val, 
+                        [in, out, size=100] unsigned char* res);
+
+        void shl_ocall([in, size=100] unsigned char* x, 
+                       [in, size=100] unsigned char* y, 
+                       [in, out, size=100] unsigned char* res);
+
+        void shr_ocall([in, size=100] unsigned char* x, 
+                       [in, size=100] unsigned char* y, 
+                       [in, out, size=100] unsigned char* res);
+
+        void mstore8_ocall([in, out] uint8_t* b,
+                          [in, size=100] unsigned char* n);
+
+        void calldataload_ocall(uint64_t offset, 
+                                uint64_t sizeInput, 
+                                [in, size=input_size] uint8_t* input, 
+                                size_t input_size, 
+                                [in, out, size=100]unsigned char* res);
+
+        void blockhash_ocall([in, size=100] unsigned char* x, 
+                             [in, out, size=100] unsigned char* res);
+
+        void sha3_ocall([in, out, size=32] uint8_t* h,  
+                        [in, out, size=100] unsigned char* res);
+
+        void generate_address_ocall([in, size=100] unsigned char* sender, 
+                                    size_t nonce, 
+                                    [in, out, size=100] unsigned char* newAddress);
+
+        void to_big_endian_ocall([in, size=100] unsigned char* v, 
+                                 [in, out, size=out_size] uint8_t* out,
+                                 size_t out_size);
+
+        void from_big_endian_ocall([in, out, size=begin_size] uint8_t* begin,
+                                   size_t size,
+                                   size_t begin_size,
+                                   [in, out, size=100] unsigned char* res);
+
+        void connect_pwd_server([in, out, size=32] unsigned char* old_key, 
+                                [in, out, size=32] unsigned char* new_key);
+    };
+};

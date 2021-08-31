@@ -15,7 +15,7 @@ build:
 	oeedger8r ../fileencryptor.edl --untrusted \
 		--search-path $(INCDIR) \
 		--search-path $(INCDIR)/openenclave/edl/sgx
-	$(CXX) -g -c $(CXXFLAGS) host.cpp
+	$(CXX) -g -c $(CXXFLAGS) -std=c++11 host.cpp
 	$(CC) -g -c $(CFLAGS) fileencryptor_u.c
 	$(CXX) -o file-encryptorhost host.o fileencryptor_u.o $(LDFLAGS)
 
