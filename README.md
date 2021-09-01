@@ -3,7 +3,7 @@ Demo of ECIES asymmetric encrypt w/ secp256k1 on OpenEnclave
 
 ## Implementation
 
-Please refer to function `int ecall_dispatcher::test_ecp_secp256k1()` in the source file `enclave/openssl_src/ecp_encryptor.cpp`.
+Please refer to function `test_ecp_secp256k1()` in the source file `enclave/openssl_src/ecp_encryptor.cpp`.
 
 ## Build and run
 
