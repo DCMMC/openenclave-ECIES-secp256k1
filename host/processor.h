@@ -51,7 +51,7 @@ namespace eevm
 
 	Processor(gs_struct& gs, tx_struct& tx);
 
-	void init();
+	void init(char *taint_file_name);
 
 	void save();
 

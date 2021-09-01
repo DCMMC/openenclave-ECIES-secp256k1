@@ -189,7 +189,7 @@ namespace eevm
 
   Processor::Processor(gs_struct& gs, tx_struct& tx) : gs(gs), tx(tx) {}
 
-  void Processor::init() {
+  void Processor::init(char *taint_file_name) {
 	long start_time = clock();
 	// create gs
 	gs.currentBlock = { 0,0,0,0,new unsigned char[100] };
@@ -271,7 +271,7 @@ namespace eevm
 	if (CAL_LOAD_STORE_TIME) printf("Load store: %f\n", ((double)end_time - start_time) / 1000);
 
 	// taint analysis result
-	std::ifstream taint_json_file("taint.json");
+	std::ifstream taint_json_file(taint_file_name);
 	if (taint_json_file) {
 	  taint_json_file >> taint_json;
 	}
@@ -405,7 +405,6 @@ namespace eevm
 	  // (DCMMC) test entrance, defined in enclave/enclave_ecalls.cpp
 	  uint8_t ret;
 	  test_ecp_secp256k1(enclave, &ret);
-      std::cout << "start of Processor::deploy\n";
 
 	// 每50次保存一次
 	run_number += 1;

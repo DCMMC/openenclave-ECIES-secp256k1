@@ -49,11 +49,14 @@ if ((NOT DEFINED ENV{OE_SIMULATION}) OR (NOT $ENV{OE_SIMULATION}))
     run
     DEPENDS file-encryptor_host sign ERC20_combined.json
     COMMAND file-encryptor_host ${CMAKE_CURRENT_SOURCE_DIR}/ERC20_combined.json
-            ${CMAKE_BINARY_DIR}/enclave/enclave.signed)
+            ${CMAKE_BINARY_DIR}/enclave/enclave.signed
+            ${CMAKE_CURRENT_SOURCE_DIR}/taint.json)
 endif ()
 
 add_custom_target(
   simulate
   DEPENDS file-encryptor_host sign ERC20_combined.json
   COMMAND file-encryptor_host ${CMAKE_CURRENT_SOURCE_DIR}/ERC20_combined.json
-          ${CMAKE_BINARY_DIR}/enclave/enclave.signed --simulate)
+          ${CMAKE_BINARY_DIR}/enclave/enclave.signed
+          ${CMAKE_CURRENT_SOURCE_DIR}/taint.json
+          --simulate)
